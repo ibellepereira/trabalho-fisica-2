@@ -66,4 +66,18 @@ public final class Fis {
 	public static Double angulo(Double x, Double y){
 		 return (double) Math.round(Math.toDegrees(Math.atan(y/x)));
 	}
+	
+	/**Calcula a posição em y, de uma carga de teste considerando a interação entre duas partículas a um ângulo theta
+	 * @param q1 partícula
+	 * @param q2 partícula
+	 * @param angulo angulo
+	 * @return posição y da carga teste
+	 * **/
+	public static Double posY(Particula q1, Particula q2, Double posX, Double angulo){
+		Double Er;
+		
+		Er = campoEletrico(q1, posX, angulo)-campoEletrico(q2, Math.abs(q1.getPosX()-q2.getPosX())-posX, angulo);
+		
+		return Math.sqrt(Math.abs(Math.cos(angulo)*Ko*q1.getCarga()/Er));
+	}
 }
