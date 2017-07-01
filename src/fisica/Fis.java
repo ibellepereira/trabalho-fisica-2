@@ -51,7 +51,7 @@ public final class Fis {
 		Epq1 = campoEletrico(q1, p);
 		Epq2 = campoEletrico(q2, p);
 		
-		return Epq2 + Epq1;
+		return Math.abs(Epq2 - Epq1);
 	}
 	
 	/**Calcula o valor do campo eletrico de uma carga em cima de um ponto a uma determinada distância. 

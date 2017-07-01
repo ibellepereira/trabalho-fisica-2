@@ -17,6 +17,8 @@ public class Carga {
 	public Carga(Double valorCarga, Double x, Double y, Double raio){
 		this.carga = new Particula();
 		this.carga.setCarga(valorCarga);
+		this.carga.setPosX(x);
+		this.carga.setPosY(y);
 		
 		this.shape = new Circle();
 		configShape(x, y, raio);
@@ -24,39 +26,42 @@ public class Carga {
 	
 	private void configShape(Double x, Double y, Double raio){
 		shape.setRadius(raio);
-		shape.setLayoutX(x);
-		shape.setLayoutY(y);
+		shape.setCenterX(x);
+		shape.setCenterY(y);
 		if(carga.getCarga()>0) shape.setFill(Color.MEDIUMBLUE);
 		else shape.setFill(Color.DARKRED);
 		
 		this.shape.setOnMousePressed(new EventHandler<MouseEvent>() {
 			  @Override public void handle(MouseEvent mouseEvent) {
 			    // record a delta distance for the drag and drop operation.
-			    Double x = shape.getLayoutX() - mouseEvent.getSceneX();
-			    Double y = shape.getLayoutY() - mouseEvent.getSceneY();
+			    Double x = shape.getCenterX() - mouseEvent.getSceneX();
+			    Double y = shape.getCenterY() - mouseEvent.getSceneY();
 			    
 			    FisUI.dragDeltax = x;
 			    FisUI.dragDeltay = y;
 			   
 			    shape.setCursor(Cursor.MOVE); //desenho do cursor
+			    FisUI.limpaCanvas();
 			  }
 			});
 			
 			this.shape.setOnMouseReleased(new EventHandler<MouseEvent>() {
 			  @Override public void handle(MouseEvent mouseEvent) {
 				  shape.setCursor(Cursor.HAND);
-				  if(shape.getLayoutX() > 500 || shape.getLayoutX() < 0 ||
-			    	 shape.getLayoutY() > 500 || shape.getLayoutY() < 0 ){
+				  if(shape.getCenterX() > 500 || shape.getCenterX() < 0 ||
+			    	 shape.getCenterY() > 500 || shape.getCenterY() < 0 ){
 					 shape.setVisible(false);
 					 removeCarga();
 				  }
-				 
+				  carga.setPosX(shape.getCenterX());
+				  carga.setPosY(shape.getCenterY());
+				  FisUI.desenhaCampoEletrico();
 			  }
 			});
 			this.shape.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			  @Override public void handle(MouseEvent mouseEvent) {
-				  shape.setLayoutX(mouseEvent.getSceneX() + FisUI.dragDeltax);
-				  shape.setLayoutY(mouseEvent.getSceneY() + FisUI.dragDeltay);
+				  shape.setCenterX(mouseEvent.getSceneX() + FisUI.dragDeltax);
+				  shape.setCenterY(mouseEvent.getSceneY() + FisUI.dragDeltay);
 				  
 				//  System.out.println(shape.getLayoutX()/5);
 				// System.out.println(shape.getLayoutY()/5);
@@ -108,8 +113,10 @@ public class Carga {
 	
 	public void alteraCarga(Double valorCarga){
 		this.carga.setCarga(valorCarga);
+		if(valorCarga==0) {shape.setVisible(false); removeCarga();}
 		if(valorCarga>0) shape.setFill(Color.MEDIUMBLUE);
 		else shape.setFill(Color.DARKRED);
+		FisUI.desenhaCampoEletrico();
 	}
 
 	public Particula getCarga() {

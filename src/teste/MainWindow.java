@@ -21,6 +21,7 @@ public class MainWindow extends Application {
 		borderPane.setRight(UI.infoUI());
 		
 		UI.setRaiz(borderPane.getRight());
+		UI.setRaizCanvas(borderPane.getCenter());
 		
 		BorderPane.setMargin(borderPane.getRight(), new Insets(20,20,20,20));
 		

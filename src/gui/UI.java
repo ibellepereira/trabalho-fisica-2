@@ -1,5 +1,8 @@
 package gui;
 
+import fisica.Fis;
+import fisica.Particula;
+import fisica.Ponto;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -26,6 +29,8 @@ import javafx.stage.WindowEvent;
 
 public final class UI {
 	protected static Node raiz;
+	protected static Node raizCanvas;
+	
 
 	public static GridPane infoUI(){
 		GridPane grid = new GridPane();
@@ -38,44 +43,44 @@ public final class UI {
 		valorQ1.setPrefWidth(50);
 		valorQ1.setId("q1");
 		valorQ1.setEditable(false);
-		/*valorQ1.textProperty().addListener((observable, oldValue, newValue) -> {
+		valorQ1.textProperty().addListener((observable, oldValue, newValue) -> {
 		    if(FisUI.cargas.size() > 0 ){
 		    	valorQ1.setEditable(true);
 		    	FisUI.cargas.get(0).alteraCarga(Double.parseDouble(newValue));		    	
 		    }else{valorQ1.setEditable(false);}
-		});*/
+		});
 		
 		Label q2 = new Label("Carga'");
 		TextField valorQ2 = new TextField();
 		valorQ2.setId("q2");
 		valorQ2.setPrefWidth(50);
 		valorQ2.setEditable(false);
-	/*	valorQ2.textProperty().addListener((observable, oldValue, newValue) -> {
-		    if(FisUI.cargas.size() > 0){
+		valorQ2.textProperty().addListener((observable, oldValue, newValue) -> {
+		    if(FisUI.cargas.size() > 1){
 		    	valorQ2.setEditable(true);
 		    	FisUI.cargas.get(1).alteraCarga(Double.parseDouble(newValue));		    	
 		    }else{valorQ2.setEditable(false);}
-		});*/
+		});
 		
-		Label distancia = new Label("Distância");
+		Label distancia = new Label("Distância\n");
 		TextField valorDistancia = new TextField();
 		valorDistancia.setId("distancia");
 		valorDistancia.setPrefWidth(50);
 		valorDistancia.setEditable(false);
 		
-		Label x = new Label("Pos X");
+		Label x = new Label("Distancia\nde carga");
 		TextField valorX = new TextField();
 		valorX.setId("posX");
 		valorX.setPrefWidth(50);
 		valorX.setEditable(false);
 		
-		Label y = new Label("Pos Y");
+		Label y = new Label("Distancia\nde carga'");
 		TextField valorY = new TextField();
 		valorY.setId("posY");
 		valorY.setPrefWidth(50);
 		valorY.setEditable(false);
 		
-		Label er = new Label("Campo\nElétrico");
+		Label er = new Label("Campo\nElétrico (μC)");
 		TextField valorEr = new TextField();
 		valorEr.setId("campoEletrico");
 		valorEr.setPrefWidth(50);
@@ -108,14 +113,22 @@ public final class UI {
 		
 		Pane layer0 = new Pane(); //objetos
 		Canvas layer1 = new Canvas(500,500); // campoel
+		layer1.setId("canvasCampoEletrico");
 		Canvas layer2 = new Canvas(500,500); // campoequi
 		
 		layerCargas(layer0);
+		layer1.setPickOnBounds(true);
 		
-		GraphicsContext area = layer1.getGraphicsContext2D();
+		GraphicsContext gc = layer2.getGraphicsContext2D();
+		gc.setFill(Color.WHITE);
+		gc.fillRect(0, 0, 500, 500);
 		
-		area.setFill(Color.WHITE);
-		area.fillRect(0, 0, 500, 500);
+		//1m equivale a 30px
+		gc.setFill(Color.GRAY);
+		gc.strokeLine(450, 480, 480, 480 ); // linha de medida
+		gc.strokeLine(450, 475, 450 , 485); // início
+		gc.strokeLine(480, 475, 480, 485); // térmico
+		gc.strokeText("1m", 455, 475);
 		
 		raiz.getChildren().addAll(layer2, layer1,layer0);
 
@@ -135,19 +148,29 @@ public final class UI {
 				menuContexto(menu, scene, event);
 				if(event.getButton() == MouseButton.SECONDARY && FisUI.isShapeSelected == false){
 					menu.show(scene, event.getScreenX(), event.getScreenY());
-					
 				}
 				else{
 					menu.hide();
 				}
 			}
 		});
+		scene.setOnMouseMoved(new EventHandler<MouseEvent>(){
+			@Override
+			public void handle(MouseEvent event) {
+				atualizaValores();
+				//FisUI.desenhaCampoEletrico();
+			}
+		});;
+
 		
 	 	
 	 }
 
 	public static void layerCampoEletrico(Canvas scene){
 		GraphicsContext gc = scene.getGraphicsContext2D();
+		
+		//FisUI.desenhaCampoEletrico();
+		//FisUI.desenhaCampoEletrico();
 		
 		
 		
@@ -163,7 +186,7 @@ public final class UI {
 		addCarga.setOnAction(new EventHandler<ActionEvent>(){
 			@Override
 			public void handle(ActionEvent event) {
-				scene.getChildren().add(FisUI.criaCarga(-1.0, mouse.getX(), mouse.getY()));
+				scene.getChildren().add(FisUI.criaCarga(1.0, mouse.getX(), mouse.getY()));
 			}
 		});
 		
@@ -181,6 +204,7 @@ public final class UI {
 		
 		if(FisUI.cargasTeste.size() < FisUI.numMaxCargasTeste)
 			menu.getItems().add(addCargaTeste);
+		
 	}
 	
 	public static void atualizaValores(){
@@ -214,16 +238,61 @@ public final class UI {
 		}
 		
 		if(FisUI.cargasTeste.size()>0){
+			
+			switch(FisUI.cargas.size()){
+				case 0:
+					field = (TextField) node.lookup("#posX");
+					field.setText("0.0");
+					
+					field = (TextField) node.lookup("#posY");
+					field.setText("0.0");
+					
+					field = (TextField) node.lookup("#campoEletrico");
+					field.setText("0.0");
+					break;
+					
+				case 1:
+					field = (TextField) node.lookup("#posX");
+					field.setText(Math.sqrt(Math.pow(FisUI.cargas.get(0).getCarga().getPosX() - FisUI.cargasTeste.get(0).getCarga().getPosX(), 2)+Math.pow(FisUI.cargas.get(0).getCarga().getPosY() - FisUI.cargasTeste.get(0).getCarga().getPosY(), 2))/30+"");
+					
+					//System.out.println(Math.sqrt(Math.pow(FisUI.cargas.get(0).getCarga().getPosX() - FisUI.cargasTeste.get(0).getCarga().getPosX(), 2)+Math.pow(FisUI.cargas.get(0).getCarga().getPosY() - FisUI.cargasTeste.get(0).getCarga().getPosY(), 2))/30);
+					
+					field = (TextField) node.lookup("#posY");
+					field.setText("0.0");
+					
+					field = (TextField) node.lookup("#campoEletrico");
+					field.setText(Fis.forcaEletrica(FisUI.cargas.get(0).getCarga(), FisUI.cargasTeste.get(0).getCarga())/1000000+"");
+					break;
+				case 2:
+					field = (TextField) node.lookup("#posX");
+					field.setText(Math.sqrt(Math.pow(FisUI.cargas.get(0).getCarga().getPosX() - FisUI.cargasTeste.get(0).getCarga().getPosX(), 2)+Math.pow(FisUI.cargas.get(0).getCarga().getPosY() - FisUI.cargasTeste.get(0).getCarga().getPosY(), 2))/30+"");
+					
+					field = (TextField) node.lookup("#posY");
+					field.setText(Math.sqrt(Math.pow(FisUI.cargas.get(1).getCarga().getPosX() - FisUI.cargasTeste.get(0).getCarga().getPosX(), 2)+Math.pow(FisUI.cargas.get(1).getCarga().getPosY() - FisUI.cargasTeste.get(0).getCarga().getPosY(), 2))/30+"");
+					
+					field = (TextField) node.lookup("#campoEletrico");
+					field.setText(Fis.campoEletricoResultante(FisUI.cargas.get(0).getCarga(), FisUI.cargas.get(1).getCarga(), new Ponto(FisUI.cargasTeste.get(0).getCarga().getPosX(), FisUI.cargasTeste.get(0).getCarga().getPosY()))/1000000+"");
+					break;
+			}
+		}
+		else{
 			field = (TextField) node.lookup("#posX");
-			field.setText(FisUI.cargasTeste.get(0).getCirculo().getLayoutX()/5+"");
+			field.setText("0.0");
 			
 			field = (TextField) node.lookup("#posY");
-			field.setText(FisUI.cargasTeste.get(0).getCirculo().getLayoutY()/5+"");
+			field.setText("0.0");
+			
+			field = (TextField) node.lookup("#campoEletrico");
+			field.setText("0.0");
 		}
+		
 	}
 	
 	public static void setRaiz(Node node){
 		raiz = node;
 	}
 	
+	public static void setRaizCanvas(Node node){
+		raizCanvas = node;
+	}
 }
