@@ -1,2 +1,2 @@
-# trabalho-fisica-2
-Trabalho de campo elétrico
+# Trabalho de Física 2
+Simulador de campo elétrico
