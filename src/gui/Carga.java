@@ -41,7 +41,7 @@ public class Carga {
 			    FisUI.dragDeltay = y;
 			   
 			    shape.setCursor(Cursor.MOVE); //desenho do cursor
-			    FisUI.limpaCanvas();
+			    if(shape.getFill() != Color.BLACK) FisUI.limpaCanvas();
 			  }
 			});
 			
@@ -55,7 +55,7 @@ public class Carga {
 				  }
 				  carga.setPosX(shape.getCenterX());
 				  carga.setPosY(shape.getCenterY());
-				  FisUI.desenhaCampoEletrico();
+				  if(shape.getFill() != Color.BLACK) FisUI.limpaCanvas(); FisUI.desenhaCampoEletrico();
 			  }
 			});
 			this.shape.setOnMouseDragged(new EventHandler<MouseEvent>() {

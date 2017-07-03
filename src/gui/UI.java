@@ -1,31 +1,23 @@
 package gui;
 
 import fisica.Fis;
-import fisica.Particula;
 import fisica.Ponto;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.stage.WindowEvent;
 
 public final class UI {
 	protected static Node raiz;
@@ -38,7 +30,7 @@ public final class UI {
 		grid.setVgap(10);
 		grid.setHgap(10);
 	
-		Label q1 = new Label("Carga");
+		Label q1 = new Label("Carga (C)");
 		TextField valorQ1 = new TextField();
 		valorQ1.setPrefWidth(50);
 		valorQ1.setId("q1");
@@ -50,7 +42,7 @@ public final class UI {
 		    }else{valorQ1.setEditable(false);}
 		});
 		
-		Label q2 = new Label("Carga'");
+		Label q2 = new Label("Carga' (C)");
 		TextField valorQ2 = new TextField();
 		valorQ2.setId("q2");
 		valorQ2.setPrefWidth(50);
@@ -62,25 +54,19 @@ public final class UI {
 		    }else{valorQ2.setEditable(false);}
 		});
 		
-		Label distancia = new Label("Distância\n");
-		TextField valorDistancia = new TextField();
-		valorDistancia.setId("distancia");
-		valorDistancia.setPrefWidth(50);
-		valorDistancia.setEditable(false);
-		
-		Label x = new Label("Distancia\nde carga");
+		Label x = new Label("Distancia\nde carga (m)");
 		TextField valorX = new TextField();
 		valorX.setId("posX");
 		valorX.setPrefWidth(50);
 		valorX.setEditable(false);
 		
-		Label y = new Label("Distancia\nde carga'");
+		Label y = new Label("Distancia\nde carga' (m)");
 		TextField valorY = new TextField();
 		valorY.setId("posY");
 		valorY.setPrefWidth(50);
 		valorY.setEditable(false);
 		
-		Label er = new Label("Campo\nElétrico (μC)");
+		Label er = new Label("Campo\nElétrico (N/C)");
 		TextField valorEr = new TextField();
 		valorEr.setId("campoEletrico");
 		valorEr.setPrefWidth(50);
@@ -160,22 +146,8 @@ public final class UI {
 				atualizaValores();
 				//FisUI.desenhaCampoEletrico();
 			}
-		});;
-
-		
-	 	
+		});;	
 	 }
-
-	public static void layerCampoEletrico(Canvas scene){
-		GraphicsContext gc = scene.getGraphicsContext2D();
-		
-		//FisUI.desenhaCampoEletrico();
-		//FisUI.desenhaCampoEletrico();
-		
-		
-		
-		
-	}
 
 	//operações
 	private static void menuContexto(ContextMenu menu,  Pane scene, MouseEvent mouse){
@@ -271,7 +243,7 @@ public final class UI {
 					field.setText(Math.sqrt(Math.pow(FisUI.cargas.get(1).getCarga().getPosX() - FisUI.cargasTeste.get(0).getCarga().getPosX(), 2)+Math.pow(FisUI.cargas.get(1).getCarga().getPosY() - FisUI.cargasTeste.get(0).getCarga().getPosY(), 2))/30+"");
 					
 					field = (TextField) node.lookup("#campoEletrico");
-					field.setText(Fis.campoEletricoResultante(FisUI.cargas.get(0).getCarga(), FisUI.cargas.get(1).getCarga(), new Ponto(FisUI.cargasTeste.get(0).getCarga().getPosX(), FisUI.cargasTeste.get(0).getCarga().getPosY()))/1000000+"");
+					field.setText(Fis.campoEletricoResultante(FisUI.cargas.get(0).getCarga(), FisUI.cargas.get(1).getCarga(), new Ponto(FisUI.cargasTeste.get(0).getCarga().getPosX(), FisUI.cargasTeste.get(0).getCarga().getPosY()))/900+"");
 					break;
 			}
 		}
